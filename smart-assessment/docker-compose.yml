@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: smart-assessment-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root123456}
+      MYSQL_DATABASE: smart_assessment
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - smart-assessment-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smart-assessment-server
+    restart: unless-stopped
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=${DB_ROOT_PASSWORD:-root123456}
+      - DB_NAME=smart_assessment
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - PORT=3001
+      - NODE_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_API_URL=${OPENAI_API_URL:-https://api.openai.com/v1}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - smart-assessment-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: smart-assessment-client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - smart-assessment-network
+
+volumes:
+  mysql_data:
+
+networks:
+  smart-assessment-network:
+    driver: bridge

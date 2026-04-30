@@ -195,3 +195,19 @@ CREATE INDEX idx_questions_status ON questions(status);
 CREATE INDEX idx_exam_records_student ON exam_records(student_id);
 CREATE INDEX idx_exam_records_course ON exam_records(course_id);
 CREATE INDEX idx_exam_records_status ON exam_records(status);
+
+-- Insert default admin user (password: admin123)
+INSERT INTO users (username, password, phone, role, name, status) VALUES
+('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '13800000000', 'admin', '系统管理员', 'active');
+
+-- Insert default courses
+INSERT INTO courses (name, code, category, description, grade_range, status) VALUES
+('AIGC素养课', 'AIGC001', 'aigc', '人工智能生成内容基础课程，学习AI工具使用和创意表达', '1-6年级', 'active'),
+('编程思维课', 'PROG001', 'programming', '编程思维训练课程，培养逻辑思维和问题解决能力', '3-9年级', 'active');
+
+-- Insert sample questions
+INSERT INTO questions (course_id, grade, type, content, options, answer, analysis, difficulty, dimensions, status) VALUES
+(1, 1, 'single', 'AI是什么的缩写？', '[{"key":"A","value":"Artificial Intelligence"},{"key":"B","value":"Advanced Internet"},{"key":"C","value":"Auto Input"},{"key":"D","value":"Application Interface"}]', 'A', 'AI是Artificial Intelligence的缩写，意为人工智能。', 1, '["basic"]', 'approved'),
+(1, 2, 'single', '以下哪个是AI绘画工具？', '[{"key":"A","value":"Photoshop"},{"key":"B","value":"Midjourney"},{"key":"C","value":"Word"},{"key":"D","value":"Excel"}]', 'B', 'Midjourney是一款AI绘画工具，可以根据文字描述生成图像。', 2, '["basic"]', 'approved'),
+(2, 3, 'single', '编程中，"循环"的作用是什么？', '[{"key":"A","value":"让程序停止运行"},{"key":"B","value":"重复执行某段代码"},{"key":"C","value":"删除代码"},{"key":"D","value":"加速程序运行"}]', 'B', '循环用于重复执行某段代码，直到满足特定条件为止。', 2, '["logic"]', 'approved'),
+(2, 4, 'single', '以下哪个是编程语言？', '[{"key":"A","value":"HTML"},{"key":"B","value":"Python"},{"key":"C","value":"HTTP"},{"key":"D","value":"URL"}]', 'B', 'Python是一种编程语言，HTML是标记语言，HTTP是协议，URL是地址。', 1, '["basic"]', 'approved');
